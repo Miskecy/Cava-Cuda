@@ -1,5 +1,5 @@
 #include "Timer.h"
-#include "Rotor.h"
+#include "Cava.h"
 #include "Base58.h"
 #include "CmdParse.h"
 #include "ColorUtils.h" // Inclui o cabeçalho onde setColor2 é declarado
@@ -41,7 +41,7 @@ bool should_exit = false;
 // ----------------------------------------------------------------------------
 void usage()
 {
-	printf("Rotor-Cuda [OPTIONS...] [TARGETS]\n");
+	printf("Cava-Cuda [OPTIONS...] [TARGETS]\n");
 	printf("Where TARGETS is one address/xpont, or multiple hashes/xpoints file\n\n");
 
 	printf("-h, --help                               : Display this message\n");
@@ -74,9 +74,9 @@ void usage()
 	printf("                                         Where START, END, COUNT are in hex format\n");
 	printf("-r, --rkey Rkey                          : Reloads random start Private key every (-r 10 = 10.000.000.000), default is disabled\n");
 	printf("-v, --version                            : Show version\n");
-    printf("-cl, --color COLOR                       : Set console text color (0-7)\n"); // Nova opção para cor
-    printf("-s, --stop                               : Stop when a key is found (default: false)\n");
-    printf("-q, --quiet                              : Compact output; hide found keys on screen\n");
+	printf("-cl, --color COLOR                       : Set console text color (0-7)\n"); // Nova opção para cor
+	printf("-s, --stop                               : Stop when a key is found (default: false)\n");
+	printf("-q, --quiet                              : Compact output; hide found keys on screen\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -324,9 +324,9 @@ int main(int argc, char **argv)
 	bool useSSE = true;
 	uint32_t maxFound = 1024 * 64;
 
-    uint64_t rKey = 0;
-    bool stopOnFound = false;
-    bool quietMode = false;
+	uint64_t rKey = 0;
+	bool stopOnFound = false;
+	bool quietMode = false;
 
 	Int rangeStart;
 	Int rangeEnd;
@@ -356,8 +356,8 @@ int main(int argc, char **argv)
 	parser.add("", "--range", true);
 	parser.add("-r", "--rkey", true);
 	parser.add("-v", "--version", false);
-    parser.add("-s", "--stop", false);
-    parser.add("-q", "--quiet", false);
+	parser.add("-s", "--stop", false);
+	parser.add("-q", "--quiet", false);
 	parser.add("-cl", "--color", true); // Adiciona a opção para cor
 
 	if (argc == 1)
@@ -391,7 +391,7 @@ int main(int argc, char **argv)
 			}
 			else if (optArg.equals("-c", "--check"))
 			{
-				printf("  Rotor-Cuda v" RELEASE "\n\n");
+				printf("  Cava-Cuda v" RELEASE "\n\n");
 				printf("\n  Checking... Secp256K1\n\n");
 				Secp256K1 *secp = new Secp256K1();
 				secp->Init();
@@ -470,7 +470,7 @@ int main(int argc, char **argv)
 			}
 			else if (optArg.equals("-v", "--version"))
 			{
-				printf("Rotor-Cuda v" RELEASE "\n");
+				printf("Cava-Cuda v" RELEASE "\n");
 				return 0;
 			}
 			else if (optArg.equals("-cl", "--color"))
@@ -481,14 +481,14 @@ int main(int argc, char **argv)
 					throw std::string("Color must be between 0 and 7");
 				}
 			}
-        else if (optArg.equals("-s", "--stop"))
-        {
-            stopOnFound = true;
-        }
-        else if (optArg.equals("-q", "--quiet"))
-        {
-            quietMode = true;
-        }
+			else if (optArg.equals("-s", "--stop"))
+			{
+				stopOnFound = true;
+			}
+			else if (optArg.equals("-q", "--quiet"))
+			{
+				quietMode = true;
+			}
 		}
 		catch (std::string err)
 		{
@@ -664,21 +664,21 @@ int main(int argc, char **argv)
 	if (nbCPUThread < 0)
 		nbCPUThread = 0;
 
-    if (!quietMode)
-    {
-        printf("\n");
-        printf("  Rotor-Cuda v" RELEASE "\n");
-        printf("\n");
-        if (coinType == COIN_BTC)
-            printf("  COMP MODE    : %s\n", compMode == SEARCH_COMPRESSED ? "COMPRESSED" : (compMode == SEARCH_UNCOMPRESSED ? "UNCOMPRESSED" : "COMPRESSED & UNCOMPRESSED"));
-        printf("  COIN TYPE    : %s\n", coinType == COIN_BTC ? "BITCOIN" : "ETHEREUM");
-        printf("  SEARCH MODE  : %s\n", searchMode == (int)SEARCH_MODE_MA ? "Multi Address" : (searchMode == (int)SEARCH_MODE_SA ? "Single Address" : (searchMode == (int)SEARCH_MODE_MX ? "Multi X Points" : "Single X Point")));
-        printf("  DEVICE       : %s\n", (gpuEnable && nbCPUThread > 0) ? "  CPU & GPU" : ((!gpuEnable && nbCPUThread > 0) ? "CPU" : "GPU"));
-        printf("  CPU THREAD   : %d\n", nbCPUThread);
-    }
-    if (gpuEnable && !quietMode)
-    {
-        printf("  GPU IDS      : ");
+	if (!quietMode)
+	{
+		printf("\n");
+		printf("  Cava-Cuda v" RELEASE "\n");
+		printf("\n");
+		if (coinType == COIN_BTC)
+			printf("  COMP MODE    : %s\n", compMode == SEARCH_COMPRESSED ? "COMPRESSED" : (compMode == SEARCH_UNCOMPRESSED ? "UNCOMPRESSED" : "COMPRESSED & UNCOMPRESSED"));
+		printf("  COIN TYPE    : %s\n", coinType == COIN_BTC ? "BITCOIN" : "ETHEREUM");
+		printf("  SEARCH MODE  : %s\n", searchMode == (int)SEARCH_MODE_MA ? "Multi Address" : (searchMode == (int)SEARCH_MODE_SA ? "Single Address" : (searchMode == (int)SEARCH_MODE_MX ? "Multi X Points" : "Single X Point")));
+		printf("  DEVICE       : %s\n", (gpuEnable && nbCPUThread > 0) ? "  CPU & GPU" : ((!gpuEnable && nbCPUThread > 0) ? "CPU" : "GPU"));
+		printf("  CPU THREAD   : %d\n", nbCPUThread);
+	}
+	if (gpuEnable && !quietMode)
+	{
+		printf("  GPU IDS      : ");
 		for (int i = 0; i < gpuId.size(); i++)
 		{
 			printf("%d", gpuId.at(i));
@@ -707,17 +707,18 @@ int main(int argc, char **argv)
 		else
 			printf("\n");
 	}
-    if (!quietMode) printf("  SSE          : %s\n", useSSE ? "YES" : "NO");
+	if (!quietMode)
+		printf("  SSE          : %s\n", useSSE ? "YES" : "NO");
 
-    if (!quietMode)
-    {
-        if (rKey != 0)
-        {
-            printf("  RKEY         : Reload every %" PRIu64 "000000000\n", rKey);
-        }
-        printf("  MAX FOUND    : %d\n", maxFound);
-    }
-    if (!quietMode && coinType == COIN_BTC)
+	if (!quietMode)
+	{
+		if (rKey != 0)
+		{
+			printf("  RKEY         : Reload every %" PRIu64 "000000000\n", rKey);
+		}
+		printf("  MAX FOUND    : %d\n", maxFound);
+	}
+	if (!quietMode && coinType == COIN_BTC)
 	{
 		switch (searchMode)
 		{
@@ -737,7 +738,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-    else if (!quietMode)
+	else if (!quietMode)
 	{
 		switch (searchMode)
 		{
@@ -751,7 +752,8 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-    if (!quietMode) printf("  OUTPUT FILE  : %s\n", outputFile.c_str());
+	if (!quietMode)
+		printf("  OUTPUT FILE  : %s\n", outputFile.c_str());
 
 #ifdef WIN64
 	if (SetConsoleCtrlHandler(CtrlHandler, TRUE))
@@ -761,13 +763,13 @@ int main(int argc, char **argv)
 		{
 		case (int)SEARCH_MODE_MA:
 		case (int)SEARCH_MODE_MX:
-            v = new Rotor(inputFile, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
-                          maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
+			v = new Rotor(inputFile, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
+						  maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
 			break;
 		case (int)SEARCH_MODE_SA:
 		case (int)SEARCH_MODE_SX:
-            v = new Rotor(hashORxpoint, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
-                          maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
+			v = new Rotor(hashORxpoint, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
+						  maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
 			break;
 		default:
 			printf("\n\n  Nothing to do, exiting\n");
@@ -791,13 +793,13 @@ int main(int argc, char **argv)
 	{
 	case (int)SEARCH_MODE_MA:
 	case (int)SEARCH_MODE_MX:
-        v = new Rotor(inputFile, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
-                      maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
+		v = new Rotor(inputFile, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
+					  maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
 		break;
 	case (int)SEARCH_MODE_SA:
 	case (int)SEARCH_MODE_SX:
-        v = new Rotor(hashORxpoint, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
-                      maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
+		v = new Rotor(hashORxpoint, compMode, searchMode, coinType, gpuEnable, outputFile, useSSE,
+					  maxFound, rKey, rangeStart.GetBase16(), rangeEnd.GetBase16(), should_exit, stopOnFound, quietMode, color);
 		break;
 	default:
 		printf("\n\n  Nothing to do, exiting\n");

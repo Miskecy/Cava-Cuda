@@ -1,57 +1,77 @@
-# Rotor-Cuda 
+# Cava-Cuda
 
 This is a modified version of KeyHunt v1.7 by [kanhavishva](https://github.com/kanhavishva/KeyHunt-Cuda).
 A lot of gratitude to all the developers whose codes has been used here.
 
 # Features
-- For Bitcoin use ```--coin BTC``` and for Ethereum use ```--coin ETH```
-- Single address(rmd160 hash) for BTC or ETH address searching with mode ```-m ADDREES```
-- Multiple addresses(rmd160 hashes) or ETH addresses searching with mode ```-m ADDREESES```
-- XPoint[s] mode is applicable for ```--coin BTC``` only
-- Single xpoint searching with mode ```-m XPOINT```
-- Multiple xpoint searching with mode ```-m XPOINTS```
-- For XPoint[s] mode use x point of the public key, without 02 or 03 prefix(64 chars).
-- Cuda only.
+
+-   For Bitcoin use `--coin BTC` and for Ethereum use `--coin ETH`
+-   Single address(rmd160 hash) for BTC or ETH address searching with mode `-m ADDREES`
+-   Multiple addresses(rmd160 hashes) or ETH addresses searching with mode `-m ADDREESES`
+-   XPoint[s] mode is applicable for `--coin BTC` only
+-   Single xpoint searching with mode `-m XPOINT`
+-   Multiple xpoint searching with mode `-m XPOINTS`
+-   For XPoint[s] mode use x point of the public key, without 02 or 03 prefix(64 chars).
+-   Cuda only.
+
+## Updates (Dec 2025)
+
+-   `-q`, `--quiet`: suppress on‑screen key block, reduce startup logs, and print a compact single‑line status that refreshes in place
+-   `-s`, `--stop`: stop after the first match; without it the program sweeps the full `--range`
+-   Compact status format (quiet mode):
+
+```
+[2.35 Gkeys/s][177,570,054,144 (2^37.37 | 6.012954 %)][00:01:14 RUN][Found 7]
+```
+
+-   Build: Linux Makefile uses sensible defaults when `CUDA`/`CCAP` are unset (fallback CUDA path, multi‑arch gencodes or `CCAP=86`)
 
 # Usage
-- For multiple addresses or xpoints, file format must be binary with sorted data.
-- To convert Bitcoin addresses list(text format) to rmd160 hashes binary file use provided python script ```addresses_to_hash160.py```
-- To convert pubkeys list(text format) to xpoints binary file use provided python script ```pubkeys_to_xpoint.py```
-- To convert Ethereum addresses list(text format) to keccak160 hashes binary file use provided python script ```eth_addresses_to_bin.py```
-- After getting binary files from python scripts, use ```BinSort``` tool provided with KeyHunt-Cuda to sort these binary files.
-- Don't use XPoint[s] mode with ```uncompressed``` compression type.
-- CPU and GPU can not be used together, because the program divides the whole input range into equal parts for all the threads, so use either CPU or GPU so that the whole range can increment by all the threads with consistency.
-- Minimum entries for bloom filter is >= 2.
-- For Multi GPUs use ```Rotor-Cuda.exe -t 0 --gpui 0,1,2 --gpux 256,256,256,256,256,256 -m addresses --coin BTC --range 1:1fffffffff -i test.bin```
-- If you have a weak GPU or driver error, remove **--gpux 256,256** the Grid will automatically assign.
+
+-   For multiple addresses or xpoints, file format must be binary with sorted data.
+-   To convert Bitcoin addresses list(text format) to rmd160 hashes binary file use provided python script `addresses_to_hash160.py`
+-   To convert pubkeys list(text format) to xpoints binary file use provided python script `pubkeys_to_xpoint.py`
+-   To convert Ethereum addresses list(text format) to keccak160 hashes binary file use provided python script `eth_addresses_to_bin.py`
+-   After getting binary files from python scripts, use `BinSort` tool provided with KeyHunt-Cuda to sort these binary files.
+-   Don't use XPoint[s] mode with `uncompressed` compression type.
+-   CPU and GPU can not be used together, because the program divides the whole input range into equal parts for all the threads, so use either CPU or GPU so that the whole range can increment by all the threads with consistency.
+-   Minimum entries for bloom filter is >= 2.
+-   For Multi GPUs use `Cava-Cuda.exe -t 0 --gpui 0,1,2 --gpux 256,256,256,256,256,256 -m addresses --coin BTC --range 1:1fffffffff -i test.bin`
+-   If you have a weak GPU or driver error, remove **--gpux 256,256** the Grid will automatically assign.
 
 ## addresses_to_hash160.py
+
 ```
 python3 addresses_to_hash160.py addresses_in.txt hash160_out.bin
 ```
 
 ## pubkeys_to_xpoint.py
+
 ```
 python3 pubkeys_to_xpoint.py pubkeys_in.txt xpoints_out.bin
 ```
 
 ## eth_addresses_to_bin.py
+
 ```
 python3 eth_addresses_to_bin.py eth_addresses_in.txt eth_addresses_out.bin
 ```
 
 ## BinSort
-For hash160 and keccak160 ```length``` is ```20``` and for xpoint ```length``` is ```32```.
+
+For hash160 and keccak160 `length` is `20` and for xpoint `length` is `32`.
+
 ```
 BinSort.exe
 Usage: BinSort.exe length in_file out_file
 ```
 
-## Rotor-Cuda
-Run ```Rotor-Cuda.exe -h```
+## Cava-Cuda
+
+Run `Cava-Cuda.exe -h`
 
 ```
-Rotor-Cuda [OPTIONS...] [TARGETS]
+Cava-Cuda [OPTIONS...] [TARGETS]
 Where TARGETS is one address/xpont, or multiple hashes/xpoints file
 
 -h, --help                               : Display this message
@@ -83,18 +103,21 @@ Where TARGETS is one address/xpont, or multiple hashes/xpoints file
                                                :+COUNT
                                                Where START, END, COUNT are in hex format
 -r, --rkey Rkey                          : Reloads random start Private key every (-r 10 = 10.000.000.000), default is disabled
+-q, --quiet                              : Reduce screen output; single-line status; no key block on screen
+-s, --stop                               : Stop after first match is found (otherwise sweep full --range)
 -v, --version                            : Show version
 ```
 
 ### For random search add -r 1 to parameters (-r 1-1000)
 
 # CPU mode :
-Run ```Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin```
+
+Run `Cava-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin`
 
 ```
-C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin
+C:\Users\user>Cava-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin
 
-  Rotor-Cuda v1.00
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -117,9 +140,6 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -
   Bits/Elem    : 28.755175
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
-  
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
 
   Start Time   : Thu Oct 21 23:43:22 2021
   Global start : 1 (1 bit)
@@ -138,7 +158,7 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -
   CPU Core     : Start from range 1555555555 ->
 
   CPU Core     : Start from range 1AAAAAAAAA ->
-  
+
   =================================================================================
   PubAddress: 1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH
   Priv (WIF): p2pkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU73sVHnoWn
@@ -177,11 +197,13 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -
 ```
 
 ### For random search add -r 1 to parameters (-r 1-1000) Example
-Run ```Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 2```
-```
-C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 2
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 2`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 2
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -205,9 +227,6 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -
   Bits/Elem    : 28.755175
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
-  
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
 
   Start Time   : Fri Oct 22 00:13:33 2021
 
@@ -215,14 +234,16 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m addresses --coin BTC --range 1:1fffffffff -
   Base Key     : Randomly changes 6 Private keys every 2.000.000.000 on the counter
 
   [00:00:40] [R: 0] [89B7A47117DDB7E9F1C81852C06A3B3F29F6F6ECE4621917A469E7A7AB493ABF] [F: 0] [CPU+GPU: 11.93 Mk/s] [GPU: 0.00 Mk/s] [T: 491,051,008]
- ```
+```
 
 ### For random search add -r 1 to parameters (-r 1-1000)
-Run ```Rotor-Cuda.exe -t 6 -m address --coin eth --range 8000000:fffffff 0xfda5c442e76a95f96c09782f1a15d3b58e32404f```
-```
-C:\Users\user>Rotor-Cuda.exe -t 6 -m address --coin eth --range 8000000:fffffff 0xfda5c442e76a95f96c09782f1a15d3b58e32404f
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 6 -m address --coin eth --range 8000000:fffffff 0xfda5c442e76a95f96c09782f1a15d3b58e32404f`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 6 -m address --coin eth --range 8000000:fffffff 0xfda5c442e76a95f96c09782f1a15d3b58e32404f
+
+  Cava-Cuda v1.00
 
   COIN TYPE    : ETHEREUM
   SEARCH MODE  : Single Address
@@ -262,14 +283,16 @@ C:\Users\user>Rotor-Cuda.exe -t 6 -m address --coin eth --range 8000000:fffffff 
   BYE
 ```
 
-
 # GPU mode:
-## Multiple addresses mode:
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin
 
-  Rotor-Cuda v1.00
+## Multiple addresses mode:
+
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -294,9 +317,6 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
   Bits/Elem    : 28.755175
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
-  
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
 
   Start Time   : Thu Oct 21 23:51:48 2021
   Global start : 1 (1 bit)
@@ -370,12 +390,15 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
 ....
 
 ```
-### For random search add -r 1 to parameters (-r 1-1000) Example
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 5```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 5
 
-  Rotor-Cuda v1.00
+### For random search add -r 1 to parameters (-r 1-1000) Example
+
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 5`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin BTC -o Found.txt --range 1:1fffffffff -i puzzle_1_37_hash160_out_sorted.bin -r 5
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -402,9 +425,6 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
 
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
-
   Start Time   : Fri Oct 22 00:32:25 2021
 
   GPU          : GPU #0 NVIDIA GeForce RTX 2070 (36x64 cores) Grid(256x256)
@@ -415,11 +435,13 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
 ```
 
 ## Multiple addresses mode with ethereum
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin eth --range 1:1fffffffff -i puzzle_1_37_addresses_eth_sorted.bin -o Found_Eth.txt```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin eth --range 1:1fffffffff -i puzzle_1_37_addresses_eth_sorted.bin -o Found_Eth.txt
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin eth --range 1:1fffffffff -i puzzle_1_37_addresses_eth_sorted.bin -o Found_Eth.txt`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin eth --range 1:1fffffffff -i puzzle_1_37_addresses_eth_sorted.bin -o Found_Eth.txt
+
+  Cava-Cuda v1.00
 
   COIN TYPE    : ETHEREUM
   SEARCH MODE  : Multi Address
@@ -444,9 +466,6 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
 
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
-
   Start Time   : Thu Oct 21 23:54:45 2021
   Global start : 1 (1 bit)
   Global end   : 1FFFFFFFFF (37 bit)
@@ -470,7 +489,7 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
   Priv (HEX): 483
   PubK (HEX): 8B05B0603ABD75B0C57489E451F811E1AFE54A8715045CDF4888333F3EBC6E8B1D10F88145DB40FB889E2DDCE81BDA7C27F5B615ACD6179DBB30F4FE7F40FB39
   =================================================================================
-  
+
   ....
   =================================================================================
   PubAddress: 0xe392229bd7664f4ce539303ce60a2235d915caca
@@ -494,12 +513,14 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m addresses --coin
 
 ```
 
-## Single address mode 
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin BTC --range 400000000:7ffffffff 1PWCx5fovoEaoBowAvF5k91m2Xat9bMgwb```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin BTC --range 400000000:7ffffffff 1PWCx5fovoEaoBowAvF5k91m2Xat9bMgwb
+## Single address mode
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin BTC --range 400000000:7ffffffff 1PWCx5fovoEaoBowAvF5k91m2Xat9bMgwb`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin BTC --range 400000000:7ffffffff 1PWCx5fovoEaoBowAvF5k91m2Xat9bMgwb
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -543,11 +564,13 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin B
 ```
 
 ## Single address mode with ethereum
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin eth --range 800000000:fffffffff 0x1ffbb8f1dfc7e2308c39637e3f4b63c2362ddc6c```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin eth --range 800000000:fffffffff 0x1ffbb8f1dfc7e2308c39637e3f4b63c2362ddc6c
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin eth --range 800000000:fffffffff 0x1ffbb8f1dfc7e2308c39637e3f4b63c2362ddc6c`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin eth --range 800000000:fffffffff 0x1ffbb8f1dfc7e2308c39637e3f4b63c2362ddc6c
+
+  Cava-Cuda v1.00
 
   COIN TYPE    : ETHEREUM
   SEARCH MODE  : Single Address
@@ -589,11 +612,13 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m address --coin e
 ```
 
 ## Multiple XPoints mode
-Run ```Rotor-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC --range 1:1fffffffff -i xpoints_1_37_out_sorted.bin```
-```
-C:\Users\user>Rotor-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC --range 1:1fffffffff -i xpoints_1_37_out_sorted.bin
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC --range 1:1fffffffff -i xpoints_1_37_out_sorted.bin`
+
+```
+C:\Users\user>Cava-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC --range 1:1fffffffff -i xpoints_1_37_out_sorted.bin
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -618,9 +643,6 @@ C:\Users\user>Rotor-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC -
   Bits/Elem    : 28.755175
   Bytes        : 266 (0 MB)
   Hash funcs   : 20
-
-  Site         : https://github.com/phrutis/Rotor-Cuda
-  Donate       : bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
 
   Start Time   : Thu Oct 21 23:59:58 2021
   Global start : 1 (1 bit)
@@ -665,11 +687,13 @@ C:\Users\user>Rotor-Cuda -t 0 -g --gpui 0 --gpux 256,256 -m xpoints --coin BTC -
 ```
 
 ## Single XPoint mode
-Run ```Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BTC --range 8000000000:ffffffffff a2efa402fd5268400c77c20e574ba86409ededee7c4020e4b9f0edbee53de0d4```
-```
-C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BTC --range 8000000000:ffffffffff a2efa402fd5268400c77c20e574ba86409ededee7c4020e4b9f0edbee53de0d4
 
-  Rotor-Cuda v1.00
+Run `Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BTC --range 8000000000:ffffffffff a2efa402fd5268400c77c20e574ba86409ededee7c4020e4b9f0edbee53de0d4`
+
+```
+C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BTC --range 8000000000:ffffffffff a2efa402fd5268400c77c20e574ba86409ededee7c4020e4b9f0edbee53de0d4
+
+  Cava-Cuda v1.00
 
   COMP MODE    : COMPRESSED
   COIN TYPE    : BITCOIN
@@ -713,42 +737,53 @@ C:\Users\user>Rotor-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BT
 ```
 
 ## Building
-##### Windows
-- Microsoft Visual Studio Community 2019
-- CUDA version [**10.22**](https://developer.nvidia.com/cuda-10.2-download-archive?target_os=Windows&target_arch=x86_64&target_version=10&target_type=exenetwork)
+
 ##### Linux
- - Edit the makefile and set up the appropriate CUDA SDK and compiler paths for nvcc. Or pass them as variables to `make` command.
- - Install libgmp: ```sudo apt install -y libgmp-dev```
+
+-   Edit the makefile and set up the appropriate CUDA SDK and compiler paths for nvcc. Or pass them as variables to `make` command.
+-   Install libgmp: `sudo apt install -y libgmp-dev`
 
     ```make
-    CUDA       = /usr/local/cuda-11.0
-    CXXCUDA    = /usr/bin/g++
+    CUDA       = ${CUDA_HOME}
+    CXXCUDA    = /usr/bin/g++-9
     ```
- - To build CPU-only version (without CUDA support):
+
+-   To build CPU/GPU version (CUDA support 8.6):
     ```sh
     $ make all
     ```
- - To build with CUDA: pass CCAP value according to your GPU compute capability
+-   To build with CUDA: pass CCAP value according to your GPU compute capability
+
     ```sh
-    $ cd Rotor-Cuda
+    $ cd src
     $ make gpu=1 CCAP=75 all
     ```
+
+-   Notes:
+    -   If `CCAP` is not provided, the Makefile selects a sensible default (e.g., `86`) or falls back to a multi‑arch `-gencode` set.
+    -   If `CUDA` is not provided, the Makefile falls back to `/usr/local/cuda`.
+
 #### BinSort
+
 ```sh
 $ cd BinSort
 $ make
 ```
+
 #### Python scripts
+
 ```
 python3 -m pip install base58
 ```
 
 ## License
-Rotor-Cuda is licensed under GPLv3.
+
+Cava-Cuda is licensed under GPLv3.
 
 ## Donation
-- BTC: bc1qh2mvnf5fujg93mwl8pe688yucaw9sflmwsukz9
 
-## __Disclaimer__
+-   BTC: 1DonateCoLNUhianPQH2rFe799LxrNZ3kp
+
+## **Disclaimer**
+
 ALL THE CODES, PROGRAM AND INFORMATION ARE FOR EDUCATIONAL PURPOSES ONLY. USE IT AT YOUR OWN RISK. THE DEVELOPER WILL NOT BE RESPONSIBLE FOR ANY LOSS, DAMAGE OR CLAIM ARISING FROM USING THIS PROGRAM.
-

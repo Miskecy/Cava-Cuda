@@ -1,11 +1,11 @@
 #---------------------------------------------------------------------
-# Makefile for Rotor
+# Makefile for Cava
 #
 # Author : Jean-Luc PONS
 
 SRC = Base58.cpp IntGroup.cpp Main.cpp Bloom.cpp Random.cpp \
       Timer.cpp Int.cpp IntMod.cpp Point.cpp SECP256K1.cpp \
-      Rotor.cpp GPU/GPUGenerate.cpp hash/ripemd160.cpp \
+      Cava.cpp GPU/GPUGenerate.cpp hash/ripemd160.cpp \
       hash/sha256.cpp hash/sha512.cpp hash/ripemd160_sse.cpp \
       hash/sha256_sse.cpp hash/keccak160.cpp GmpUtil.cpp CmdParse.cpp \
       ColorUtils.cpp  # Adicionando ColorUtils.cpp
@@ -18,7 +18,7 @@ ifdef gpu
 
 OBJET = $(addprefix $(OBJDIR)/, \
         Base58.o IntGroup.o Main.o Bloom.o Random.o Timer.o Int.o \
-        IntMod.o Point.o SECP256K1.o Rotor.o GPU/GPUGenerate.o \
+        IntMod.o Point.o SECP256K1.o Cava.o GPU/GPUGenerate.o \
         hash/ripemd160.o hash/sha256.o hash/sha512.o \
         hash/ripemd160_sse.o hash/sha256_sse.o hash/keccak160.o \
         GPU/GPUEngine.o GmpUtil.o CmdParse.o ColorUtils.o)  # Adicionando ColorUtils.o
@@ -27,7 +27,7 @@ else
 
 OBJET = $(addprefix $(OBJDIR)/, \
         Base58.o IntGroup.o Main.o Bloom.o Random.o Timer.o Int.o \
-        IntMod.o Point.o SECP256K1.o Rotor.o GPU/GPUGenerate.o \
+        IntMod.o Point.o SECP256K1.o Cava.o GPU/GPUGenerate.o \
         hash/ripemd160.o hash/sha256.o hash/sha512.o \
         hash/ripemd160_sse.o hash/sha256_sse.o hash/keccak160.o \
         GmpUtil.o CmdParse.o ColorUtils.o)  # Adicionando ColorUtils.o
@@ -83,11 +83,11 @@ $(OBJDIR)/%.o : %.cpp
 $(OBJDIR)/ColorUtils.o: ColorUtils.cpp ColorUtils.h
 	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/ColorUtils.o -c ColorUtils.cpp
 
-all: Rotor
+all: Cava
 
-Rotor: $(OBJET)
-	@echo Making Rotor...
-	$(CXX) $(OBJET) $(LFLAGS) -o Rotor
+Cava: $(OBJET)
+	@echo Making Cava...
+	$(CXX) $(OBJET) $(LFLAGS) -o Cava
 
 $(OBJET): | $(OBJDIR) $(OBJDIR)/GPU $(OBJDIR)/hash
 
