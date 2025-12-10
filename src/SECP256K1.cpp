@@ -87,7 +87,19 @@ void CheckAddress(Secp256K1 *T, std::string address, std::string privKeyStr)
 	Int privKey = T->DecodePrivateKey((char *)privKeyStr.c_str(), &isCompressed);
 	Point pub = T->ComputePublicKey(&privKey);
 
-	std::string calcAddress = T->GetAddress(isCompressed, pub);
+	std::string calcAddress;
+	if (address.size() >= 3 && address[0] == 'b' && address[1] == 'c' && address[2] == '1')
+	{
+		calcAddress = T->GetAddressBech32(isCompressed, pub);
+	}
+	else if (!address.empty() && address[0] == '3')
+	{
+		calcAddress = T->GetAddressP2SH(isCompressed, pub);
+	}
+	else
+	{
+		calcAddress = T->GetAddress(isCompressed, pub);
+	}
 
 	printf("Adress : %s ", address.c_str());
 
@@ -794,6 +806,126 @@ std::string Secp256K1::GetAddress(bool compressed, Point &pubKey)
 	std::string encodedAddress = EncodeBase58(address, address + 25);
 
 	return encodedAddress;
+}
+
+static const char *bech32_charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
+static uint32_t bech32_polymod(const std::vector<uint8_t> &values)
+{
+	uint32_t chk = 1;
+	for (size_t i = 0; i < values.size(); ++i)
+	{
+		uint32_t top = chk >> 25;
+		chk = (chk & 0x1ffffff) << 5 ^ values[i];
+		if (top & 1)
+			chk ^= 0x3b6a57b2;
+		if (top & 2)
+			chk ^= 0x26508e6d;
+		if (top & 4)
+			chk ^= 0x1ea119fa;
+		if (top & 8)
+			chk ^= 0x3d4233dd;
+		if (top & 16)
+			chk ^= 0x2a1462b3;
+	}
+	return chk;
+}
+
+static std::vector<uint8_t> bech32_hrp_expand(const std::string &hrp)
+{
+	std::vector<uint8_t> ret;
+	for (size_t i = 0; i < hrp.size(); ++i)
+		ret.push_back((uint8_t)(hrp[i] >> 5));
+	ret.push_back(0);
+	for (size_t i = 0; i < hrp.size(); ++i)
+		ret.push_back((uint8_t)(hrp[i] & 0x1f));
+	return ret;
+}
+
+static std::vector<uint8_t> bech32_create_checksum(const std::string &hrp, const std::vector<uint8_t> &data)
+{
+	std::vector<uint8_t> values = bech32_hrp_expand(hrp);
+	values.insert(values.end(), data.begin(), data.end());
+	values.insert(values.end(), {0, 0, 0, 0, 0, 0});
+	uint32_t polymod = bech32_polymod(values) ^ 1;
+	std::vector<uint8_t> ret(6);
+	for (int i = 0; i < 6; ++i)
+		ret[i] = (uint8_t)((polymod >> (5 * (5 - i))) & 31);
+	return ret;
+}
+
+static std::string bech32_encode(const std::string &hrp, const std::vector<uint8_t> &data)
+{
+	std::vector<uint8_t> checksum = bech32_create_checksum(hrp, data);
+	std::string ret = hrp;
+	ret.push_back('1');
+	for (size_t i = 0; i < data.size(); ++i)
+		ret.push_back(bech32_charset[data[i]]);
+	for (size_t i = 0; i < checksum.size(); ++i)
+		ret.push_back(bech32_charset[checksum[i]]);
+	return ret;
+}
+
+static bool convertbits(std::vector<uint8_t> &out, const std::vector<uint8_t> &in, int frombits, int tobits, bool pad)
+{
+	uint32_t acc = 0;
+	int bits = 0;
+	uint32_t maxv = (1 << tobits) - 1;
+	for (size_t i = 0; i < in.size(); ++i)
+	{
+		uint8_t value = in[i];
+		if (value >> frombits)
+			return false;
+		acc = (acc << frombits) | value;
+		bits += frombits;
+		while (bits >= tobits)
+		{
+			bits -= tobits;
+			out.push_back((uint8_t)((acc >> bits) & maxv));
+		}
+	}
+	if (pad)
+	{
+		if (bits)
+			out.push_back((uint8_t)((acc << (tobits - bits)) & maxv));
+	}
+	else if (bits >= frombits || ((acc << (tobits - bits)) & maxv))
+	{
+		return false;
+	}
+	return true;
+}
+
+std::string Secp256K1::GetAddressP2SH(bool compressed, Point &pubKey)
+{
+	unsigned char pkhash[20];
+	GetHash160(compressed, pubKey, pkhash);
+	unsigned char script[22];
+	script[0] = 0x00;
+	script[1] = 0x14;
+	memcpy(script + 2, pkhash, 20);
+	unsigned char shadigest[32];
+	sha256(script, 22, shadigest);
+	unsigned char redeemhash[20];
+	ripemd160(shadigest, 32, redeemhash);
+	unsigned char address[25];
+	address[0] = 0x05;
+	memcpy(address + 1, redeemhash, 20);
+	sha256_checksum(address, 21, address + 21);
+	return EncodeBase58(address, address + 25);
+}
+
+std::string Secp256K1::GetAddressBech32(bool compressed, Point &pubKey)
+{
+	unsigned char pkhash[20];
+	GetHash160(compressed, pubKey, pkhash);
+	std::vector<uint8_t> prog(pkhash, pkhash + 20);
+	std::vector<uint8_t> data;
+	data.push_back(0);
+	std::vector<uint8_t> fivebits;
+	convertbits(fivebits, prog, 8, 5, true);
+	data.insert(data.end(), fivebits.begin(), fivebits.end());
+	return bech32_encode("bc", data);
 }
 
 std::string Secp256K1::GetAddress2(bool compressed, unsigned char *hash160)

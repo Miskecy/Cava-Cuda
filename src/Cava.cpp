@@ -336,13 +336,7 @@ bool Rotor::checkPrivKey(std::string addr, Int &key, int32_t incr, bool mode)
 	secp->GetHash160(mode, p, address + 1);
 	std::string chkAddr = secp->GetAddress(mode, p);
 	setColor2(6);
-	std::string privk = key.GetBase16(); // Obter a chave privada em formato hexadecimal
-	const size_t desiredLength = 64;
-	// Adicionar zeros à esquerda, se necessário
-	if (privk.length() < desiredLength)
-	{
-		privk.insert(0, desiredLength - privk.length(), '0'); // Preencher com zeros
-	}
+	std::string privk_initial = key.GetBase16();
 
 	if (chkAddr != addr)
 	{
@@ -357,7 +351,10 @@ bool Rotor::checkPrivKey(std::string addr, Int &key, int32_t incr, bool mode)
 
 			setColor2(3);
 			printf("\n=================================================================================\n");
-			printf("  PivK : %s\n", privk.c_str());
+			const size_t desiredLengthDbg = 64;
+			if (privk_initial.length() < desiredLengthDbg)
+				privk_initial.insert(0, desiredLengthDbg - privk_initial.length(), '0');
+			printf("  PivK : %s\n", privk_initial.c_str());
 			printf("  Addr : %s\n", addr.c_str());
 			printf("  PubX : %s\n", px.c_str());
 			printf("  PivK : %s\n", k.GetBase16().c_str());
@@ -367,6 +364,12 @@ bool Rotor::checkPrivKey(std::string addr, Int &key, int32_t incr, bool mode)
 		}
 	}
 
+	std::string privk = k.GetBase16();
+	const size_t desiredLength = 64;
+	if (privk.length() < desiredLength)
+	{
+		privk.insert(0, desiredLength - privk.length(), '0');
+	}
 	output(addr, secp->GetPrivAddress(mode, k), privk, secp->GetPublicKeyHex(mode, p));
 	return true;
 }
