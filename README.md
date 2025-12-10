@@ -748,7 +748,7 @@ C:\Users\user>Cava-Cuda.exe -t 0 -g --gpui 0 --gpux 256,256 -m xpoint --coin BTC
     CXXCUDA    = /usr/bin/g++-9
     ```
 
--   To build CPU/GPU version (CUDA support 8.6):
+-   To build CPU/GPU version (CUDA default 8.6):
     ```sh
     $ make all
     ```
